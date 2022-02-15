@@ -22,4 +22,5 @@ jobs:
     - uses: actions/checkout@v2
     - uses: ./
       with:
-        milliseconds: 1000
+        organization: 'actions'
+        github_token: ${{ secrets.github_token }}
