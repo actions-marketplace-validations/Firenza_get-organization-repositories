@@ -1,7 +1,7 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 65:
+/***/ 163:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const core = __nccwpck_require__(186);
@@ -45,14 +45,20 @@ let get_repositories = async function (github_token, organization) {
       }),
     });
   
-    const response_json = await response.json();
+    const responseJson = await response.json();
   
-    response_json.data.organization.repositories.nodes.forEach(node => {
+    if (!response.ok) {
+      core.error(responseJson)
+      core.setFailed();
+      return null;
+    }
+
+    responseJson.data.organization.repositories.nodes.forEach(node => {
         repositoryNames.push(node.name);
     });
 
-    moreRepositoriesToRead = response_json.data.organization.repositories.pageInfo.hasNextPage;
-    endCursor = response_json.data.organization.repositories.pageInfo.endCursor;
+    moreRepositoriesToRead = responseJson.data.organization.repositories.pageInfo.hasNextPage;
+    endCursor = responseJson.data.organization.repositories.pageInfo.endCursor;
     batchNum ++;
   }
 
@@ -5772,7 +5778,7 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(186);
-const get_repositories = __nccwpck_require__(65);
+const getRepositories = __nccwpck_require__(163);
 __nccwpck_require__(437).config();
 
 // most @actions toolkit packages have async methods
@@ -5783,7 +5789,7 @@ async function run() {
     const organization = core.getInput('organization') || process.env.GITHUB_ORG;
 
     core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    let repositoriesJson = await get_repositories(githubToken, organization);
+    let repositoriesJson = await getRepositories(githubToken, organization);
     core.info((new Date()).toTimeString());
 
     core.setOutput('repositories_json', repositoriesJson);
