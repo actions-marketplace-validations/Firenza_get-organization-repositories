@@ -1,4 +1,4 @@
-name: 'Get Organization Repositories'
+name: 'Get GitHub Organization Repositories'
 description: 'Gets the names of all the repositories in an organization'
 inputs:
   github_token:
