@@ -39,14 +39,20 @@ let get_repositories = async function (github_token, organization) {
       }),
     });
   
-    const response_json = await response.json();
+    const responseJson = await response.json();
   
-    response_json.data.organization.repositories.nodes.forEach(node => {
+    if (!response.ok) {
+      core.error(responseJson)
+      core.setFailed();
+      return null;
+    }
+
+    responseJson.data.organization.repositories.nodes.forEach(node => {
         repositoryNames.push(node.name);
     });
 
-    moreRepositoriesToRead = response_json.data.organization.repositories.pageInfo.hasNextPage;
-    endCursor = response_json.data.organization.repositories.pageInfo.endCursor;
+    moreRepositoriesToRead = responseJson.data.organization.repositories.pageInfo.hasNextPage;
+    endCursor = responseJson.data.organization.repositories.pageInfo.endCursor;
     batchNum ++;
   }
 

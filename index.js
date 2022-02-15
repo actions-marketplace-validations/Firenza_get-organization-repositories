@@ -1,5 +1,5 @@
 const core = require('@actions/core');
-const get_repositories = require('./get_repositories');
+const getRepositories = require('./get-repositories');
 require('dotenv').config();
 
 // most @actions toolkit packages have async methods
@@ -10,7 +10,7 @@ async function run() {
     const organization = core.getInput('organization') || process.env.GITHUB_ORG;
 
     core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    let repositoriesJson = await get_repositories(githubToken, organization);
+    let repositoriesJson = await getRepositories(githubToken, organization);
     core.info((new Date()).toTimeString());
 
     core.setOutput('repositories_json', repositoriesJson);
