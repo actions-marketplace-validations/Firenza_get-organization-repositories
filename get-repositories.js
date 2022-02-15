@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const fetch = require('node-fetch')
 
-let get_repositories = async function (github_token, organization) {
+let getRepositories = async function (github_token, organization) {
 
   let GRAPHQL_URL = 'https://api.github.com/graphql'
 
@@ -60,4 +60,4 @@ let get_repositories = async function (github_token, organization) {
 
 };
 
-module.exports = get_repositories;
+module.exports = getRepositories;
