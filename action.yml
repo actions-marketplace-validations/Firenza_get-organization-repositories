@@ -1,13 +1,15 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'Get Organization Repositories'
+description: 'Gets the names of all the repositories in an organization'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  github_token:
+    description: 'GitHub token to use'
     required: true
-    default: '1000'
+  organization:
+    description: 'Name of the organization from which to get repositories'
+    required: true
 outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+  repositories_json:
+    description: 'JSON array of the repository names'
 runs:
   using: 'node12'
   main: 'dist/index.js'

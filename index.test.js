@@ -1,24 +1,135 @@
-const wait = require('./wait');
-const process = require('process');
-const cp = require('child_process');
-const path = require('path');
+const getRepositories = require('./get-repositories');
+const core = require('@actions/core');
+const fetch = require('node-fetch')
 
-test('throws invalid number', async () => {
-  await expect(wait('foo')).rejects.toThrow('milliseconds not a number');
+jest.mock('node-fetch');
+jest.mock("@actions/core");
+
+test('Processes one repo batch properly', async () => {
+  // Arrange
+  let organization = 'testorg'
+  let githubToken = 'ImAGithubToken'
+  let expectedJson = JSON.stringify([
+    'repo1',
+    'repo2'
+  ])
+
+  fetch.mockReturnValueOnce({
+    ok: true,
+    status: 200,
+    json: function () {
+      return {
+        data: {
+          organization: {
+            repositories : {
+              nodes: [
+                {name: 'repo1'},
+                {name: 'repo2'}
+              ],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: '23423423'
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Act
+  let repositoryJson = await getRepositories(githubToken, organization);
+
+  // Assert
+  expect(repositoryJson).toBe(expectedJson);
+  expect(core.setFailed).not.toHaveBeenCalled();
 });
 
-test('wait 500 ms', async () => {
-  const start = new Date();
-  await wait(500);
-  const end = new Date();
-  var delta = Math.abs(end - start);
-  expect(delta).toBeGreaterThanOrEqual(500);
+test('Processes two repo batches properly', async () => {
+  // Arrange
+  let organization = 'testorg'
+  let githubToken = 'ImAGithubToken'
+  let expectedJson = JSON.stringify([
+    'repo1',
+    'repo2',
+    'repo3',
+    'repo4'
+  ])
+
+  fetch.mockReturnValueOnce({
+    ok: true,
+    status: 200,
+    json: function () {
+      return {
+        data: {
+          organization: {
+            repositories : {
+              nodes: [
+                {name: 'repo1'},
+                {name: 'repo2'}
+              ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'endCursor1'
+              }
+            }
+          }
+        }
+      }
+    }
+  }).mockReturnValueOnce({
+    ok: true,
+    status: 200,
+    json: function () {
+      return {
+        data: {
+          organization: {
+            repositories : {
+              nodes: [
+                {name: 'repo3'},
+                {name: 'repo4'}
+              ],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: 'endCursor2'
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Act
+  let repositoryJson = await getRepositories(githubToken, organization);
+
+  // Assert
+  expect(repositoryJson).toBe(expectedJson);
+  expect(core.setFailed).not.toHaveBeenCalled();
 });
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = 100;
-  const ip = path.join(__dirname, 'index.js');
-  const result = cp.execSync(`node ${ip}`, {env: process.env}).toString();
-  console.log(result);
-})
+test('Handle graphql error', async () => {
+  // Arrange
+  let organization = 'testorg'
+  let githubToken = 'ImAGithubToken'
+
+  fetch.mockReturnValueOnce({
+    ok: false,
+    status: 400,
+    json: function () {
+      return {
+        errors: [
+          {
+            "message": "Something done went wrong"
+          }
+        ]
+      }
+    }
+  });
+
+  // Act
+  await getRepositories(githubToken, organization);
+
+  // Assert
+  expect(core.setFailed).toHaveBeenCalled();
+});
