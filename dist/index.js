@@ -7,7 +7,7 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 const core = __nccwpck_require__(186);
 const fetch = __nccwpck_require__(467)
 
-let get_repositories = async function (github_token, organization) {
+let getRepositories = async function (github_token, organization) {
 
   let GRAPHQL_URL = 'https://api.github.com/graphql'
 
@@ -66,7 +66,7 @@ let get_repositories = async function (github_token, organization) {
 
 };
 
-module.exports = get_repositories;
+module.exports = getRepositories;
 
 
 /***/ }),
