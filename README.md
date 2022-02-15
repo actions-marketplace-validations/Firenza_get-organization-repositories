@@ -4,8 +4,6 @@ A GitHub Action to return a list of repositories in a given organization.
 
 ## Usage
 
-Sending in all the secret information
-
 ```yml
 - name: Get Organization Repositories
   id: get_org_repos
