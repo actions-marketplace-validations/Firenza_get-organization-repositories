@@ -11,16 +11,26 @@ jobs:
   units:
     runs-on: ubuntu-latest
     steps:
+
     - uses: actions/checkout@v2
+
     - run: npm ci
+
     - run: npm test
 
   # test action works running from the graph
   test:
     runs-on: ubuntu-latest
     steps:
+
     - uses: actions/checkout@v2
+
     - uses: ./
+      id: get_org_repos
       with:
         organization: 'actions'
         github_token: ${{ secrets.github_token }}
+
+    - name: Show org repos
+      shell: bash
+      run: echo ${{ steps.get_org_repos.outputs.repositories_json }}
