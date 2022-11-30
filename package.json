@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.2.5",
     "dotenv": "^16.0.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^3.3.0"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.31.1",
